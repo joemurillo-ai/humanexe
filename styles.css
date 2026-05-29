@@ -1175,6 +1175,53 @@ input:focus {
   padding: clamp(20px, 4vw, 42px);
 }
 
+.assessment-form {
+  display: grid;
+  gap: 14px;
+}
+
+.assessment-progress {
+  position: sticky;
+  top: 92px;
+  z-index: 12;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(216, 255, 226, 0.12);
+  border-radius: 8px;
+  background: rgba(5, 8, 6, 0.86);
+  backdrop-filter: blur(18px);
+}
+
+.assessment-progress div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--soft);
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.assessment-progress strong {
+  color: var(--green);
+}
+
+.assessment-progress meter {
+  width: 100%;
+  height: 8px;
+}
+
+.assessment-progress meter::-webkit-meter-bar {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.assessment-progress meter::-webkit-meter-optimum-value {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green-deep), var(--green));
+}
+
 .assessment-intro {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1208,16 +1255,14 @@ input:focus {
 
 .question-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .question-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: center;
+  gap: 12px;
   margin: 0;
-  padding: 18px;
+  padding: 15px;
   border: 1px solid rgba(216, 255, 226, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.032);
@@ -1225,11 +1270,12 @@ input:focus {
 
 .question-card legend {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   padding: 0;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 720;
+  line-height: 1.32;
 }
 
 .question-card legend span {
@@ -1242,11 +1288,16 @@ input:focus {
 
 .rating-row {
   display: grid;
-  grid-template-columns: repeat(5, 42px);
-  gap: 8px;
+  grid-template-columns: repeat(5, minmax(42px, 1fr));
+  gap: 7px;
+  max-width: 360px;
 }
 
 .rating-row label {
+  display: grid;
+  min-width: 0;
+  min-height: 42px;
+  place-items: center;
   cursor: pointer;
 }
 
@@ -1258,13 +1309,28 @@ input:focus {
   pointer-events: none;
 }
 
-.rating-row span {
+.rating-numbers {
   display: grid;
-  width: 42px;
-  height: 42px;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(5, minmax(42px, 1fr));
+  gap: 7px;
+}
+
+.rating-numbers span {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.rating-row label > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
   place-items: center;
   border: 1px solid rgba(216, 255, 226, 0.16);
-  border-radius: 8px;
+  border-radius: 999px;
   color: #d7e2da;
   font-weight: 800;
   background: rgba(255, 255, 255, 0.04);
@@ -1275,17 +1341,42 @@ input:focus {
     transform 180ms ease;
 }
 
+.rating-row label strong {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .rating-row input:checked + span,
-.rating-row label:hover span {
+.rating-row label:hover > span {
   border-color: rgba(57, 255, 122, 0.76);
-  color: #031006;
   background: var(--green);
+  box-shadow: 0 0 0 6px rgba(57, 255, 122, 0.1);
   transform: translateY(-1px);
+}
+
+.assessment-submit-bar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 14;
+  display: none;
+  padding: 10px;
+  border: 1px solid rgba(57, 255, 122, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 8, 6, 0.88);
+  box-shadow: 0 18px 58px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px);
+}
+
+.assessment-submit-bar.is-ready {
+  display: block;
 }
 
 .assessment-submit {
   width: 100%;
-  margin-top: 22px;
 }
 
 .assessment-message {
@@ -1813,16 +1904,32 @@ input:focus {
     min-width: 0;
   }
 
+  .assessment-progress {
+    top: 74px;
+  }
+
+  .assessment-progress div {
+    display: grid;
+    gap: 4px;
+  }
+
   .question-card {
     grid-template-columns: 1fr;
+    padding: 13px;
   }
 
   .rating-row {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+    max-width: none;
   }
 
-  .rating-row span {
+  .rating-numbers {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .rating-row label > span {
     width: 100%;
+    max-width: 44px;
   }
 
   .score-card {

@@ -132,6 +132,10 @@ const questions = [
 const form = document.querySelector("#assessment-form");
 const questionList = document.querySelector("#question-list");
 const message = document.querySelector(".assessment-message");
+const questionProgress = document.querySelector("#question-progress");
+const completionPercentage = document.querySelector("#completion-percentage");
+const completionMeter = document.querySelector("#completion-meter");
+const submitButton = document.querySelector(".assessment-submit");
 const results = document.querySelector("#assessment-results");
 const score = document.querySelector("#human-score");
 const summary = document.querySelector("#score-summary");
@@ -145,7 +149,14 @@ const radarChart = document.querySelector("#radar-chart");
 const previousScores = document.querySelector("#previous-scores");
 
 renderQuestions();
+updateProgress();
 loadSavedResult();
+
+form?.addEventListener("change", (event) => {
+  if (event.target.matches("input[type='radio']")) {
+    updateProgress();
+  }
+});
 
 form?.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -155,6 +166,7 @@ form?.addEventListener("submit", (event) => {
   if (Object.values(answers).some((value) => !value)) {
     message.textContent = "Complete every signal to calculate your Human Index.";
     message.classList.add("error");
+    updateProgress();
     return;
   }
 
@@ -170,6 +182,7 @@ form?.addEventListener("submit", (event) => {
 retake?.addEventListener("click", () => {
   localStorage.removeItem(assessmentKey);
   form.reset();
+  updateProgress();
   results.hidden = true;
   message.textContent = "";
   document.querySelector(".assessment-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -180,6 +193,7 @@ clearHistory?.addEventListener("click", () => {
   localStorage.removeItem(historyKey);
   localStorage.removeItem(legacyAssessmentKey);
   form.reset();
+  updateProgress();
   results.hidden = true;
   message.textContent = "Assessment history cleared on this device.";
   message.classList.remove("error");
@@ -199,7 +213,8 @@ function renderQuestions() {
           (value) => `
             <label>
               <input type="radio" name="${question.id}" value="${value}" required />
-              <span>${value}</span>
+              <span aria-hidden="true"></span>
+              <strong>${value}</strong>
             </label>
           `
         )
@@ -212,12 +227,38 @@ function renderQuestions() {
             ${question.text}
           </legend>
           <div class="rating-row" aria-label="${question.text}">
+            <div class="rating-numbers" aria-hidden="true">
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+            </div>
             ${options}
           </div>
         </fieldset>
       `;
     })
     .join("");
+}
+
+function updateProgress() {
+  if (!form || !questionProgress || !completionPercentage || !completionMeter || !submitButton) {
+    return;
+  }
+
+  const answered = new Set(
+    [...form.querySelectorAll("input[type='radio']:checked")].map((input) => input.name)
+  ).size;
+  const percent = Math.round((answered / questions.length) * 100);
+  const ready = answered === questions.length;
+
+  questionProgress.textContent = `Question ${Math.min(answered + 1, questions.length)} of ${questions.length}`;
+  completionPercentage.textContent = `${percent}% complete`;
+  completionMeter.value = percent;
+  completionMeter.textContent = `${percent}%`;
+  submitButton.disabled = !ready;
+  submitButton.closest(".assessment-submit-bar")?.classList.toggle("is-ready", ready);
 }
 
 function calculateResult(answers) {

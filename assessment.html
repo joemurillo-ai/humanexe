@@ -73,10 +73,19 @@
           </div>
 
           <form id="assessment-form" class="assessment-form">
+            <div class="assessment-progress" aria-live="polite">
+              <div>
+                <span id="question-progress">Question 0 of 20</span>
+                <strong id="completion-percentage">0% complete</strong>
+              </div>
+              <meter id="completion-meter" min="0" max="100" value="0">0%</meter>
+            </div>
             <div id="question-list" class="question-list"></div>
-            <button class="button button-primary assessment-submit" type="submit">
-              Calculate Human Index
-            </button>
+            <div class="assessment-submit-bar">
+              <button class="button button-primary assessment-submit" type="submit" disabled>
+                Calculate Human Index
+              </button>
+            </div>
             <p class="assessment-message" aria-live="polite"></p>
           </form>
         </section>
