@@ -102,6 +102,12 @@ Cloudflare Pages can deploy directly from GitHub, and every push to the selected
 6. Connect GitHub if prompted.
 7. Select the HUMAN.EXE repository.
 
+Recommended project name:
+
+```text
+humanexe-ai
+```
+
 ## 5. Configure Build Settings
 
 Use these settings:
@@ -278,3 +284,28 @@ Then check the Cloudflare Pages deployment log and visit:
 ```text
 https://humanexe.ai
 ```
+
+## 14. Optional GitHub Actions Deployment
+
+This repository includes:
+
+```text
+.github/workflows/cloudflare-pages.yml
+```
+
+This workflow deploys the repository root to Cloudflare Pages with Wrangler.
+
+Required GitHub repository secrets:
+
+```text
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+```
+
+The workflow command is:
+
+```text
+pages deploy . --project-name=humanexe-ai --branch=main
+```
+
+Use either the Cloudflare Git integration or this GitHub Actions workflow. You do not need both active at the same time.

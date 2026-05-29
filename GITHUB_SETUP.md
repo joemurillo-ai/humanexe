@@ -42,6 +42,21 @@ git push -u origin main
 - Website: `https://humanexe.ai`
 - Topics: `human-performance`, `landing-page`, `cloudflare-pages`, `startup`, `ai`
 
+## GitHub Actions Secrets For Cloudflare Deploys
+
+If using the included Cloudflare Pages workflow, add these repository secrets:
+
+```text
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+```
+
+Workflow file:
+
+```text
+.github/workflows/cloudflare-pages.yml
+```
+
 ## Public Repo Checklist
 
 - `README.md` explains the project and local preview.
