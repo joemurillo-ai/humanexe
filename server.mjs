@@ -48,7 +48,7 @@ createServer(async (request, response) => {
   }
 
   const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
-  const filePath = resolve(root, `.${decodeURIComponent(pathname)}`);
+  let filePath = resolve(root, `.${decodeURIComponent(pathname)}`);
 
   if (!filePath.startsWith(root)) {
     response.writeHead(403);
@@ -57,7 +57,19 @@ createServer(async (request, response) => {
   }
 
   try {
-    const file = await readFile(filePath);
+    let file;
+
+    try {
+      file = await readFile(filePath);
+    } catch (error) {
+      if (!extname(filePath)) {
+        filePath = `${filePath}.html`;
+        file = await readFile(filePath);
+      } else {
+        throw error;
+      }
+    }
+
     response.writeHead(200, {
       "Content-Type": contentTypes[extname(filePath)] || "application/octet-stream",
     });

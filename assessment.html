@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Take the HUMAN.EXE Assessment and generate a Human Index score across recovery, training, fuel, focus, and purpose."
+    />
+    <meta name="theme-color" content="#030403" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://humanexe.ai/assessment" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://humanexe.ai/assessment" />
+    <meta property="og:title" content="HUMAN.EXE Assessment | Human Index" />
+    <meta
+      property="og:description"
+      content="Generate a private Human Index score across recovery, training, fuel, focus, and purpose."
+    />
+    <meta property="og:image" content="https://humanexe.ai/assets/human-exe-hero.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HUMAN.EXE Assessment | Human Index" />
+    <meta
+      name="twitter:description"
+      content="Take the HUMAN.EXE Assessment and generate a private Human Index score."
+    />
+    <meta name="twitter:image" content="https://humanexe.ai/assets/human-exe-hero.png" />
+    <title>HUMAN.EXE Assessment | Human Index</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="nav">
+        <a class="brand" href="index.html" aria-label="HUMAN.EXE home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>HUMAN.EXE</span>
+        </a>
+        <nav class="nav-links" aria-label="Assessment navigation">
+          <a href="index.html#human-index">Index</a>
+          <a href="index.html#ecosystem">Ecosystem</a>
+          <a href="index.html#coach">Coach</a>
+        </nav>
+        <a class="nav-cta" href="index.html#waitlist">Early access</a>
+      </header>
+
+      <main class="assessment-page" id="top">
+        <section class="assessment-hero">
+          <p class="eyebrow">HUMAN.EXE Assessment V0.1</p>
+          <h1>Generate your ⓗ score.</h1>
+          <p>
+            A private five-minute check across recovery, training, fuel, focus,
+            and purpose. Your result stays on this device.
+          </p>
+        </section>
+
+        <section class="assessment-shell" aria-labelledby="assessment-title">
+          <div class="assessment-intro">
+            <div>
+              <p class="eyebrow">Human Index</p>
+              <h2 id="assessment-title">Answer 20 signals.</h2>
+              <p>
+                Rate each statement from 1 to 5. HUMAN.EXE converts the pattern
+                into a 0-100 operating score and the top three moves to make next.
+              </p>
+            </div>
+            <div class="assessment-scale" aria-label="Assessment scale">
+              <span>1 Low</span>
+              <span>3 Stable</span>
+              <span>5 Strong</span>
+            </div>
+          </div>
+
+          <form id="assessment-form" class="assessment-form">
+            <div id="question-list" class="question-list"></div>
+            <button class="button button-primary assessment-submit" type="submit">
+              Calculate Human Index
+            </button>
+            <p class="assessment-message" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section id="assessment-results" class="assessment-results" hidden>
+          <div class="score-card">
+            <p class="eyebrow">Human Index</p>
+            <div class="score-lockup">
+              <span>ⓗ</span>
+              <strong id="human-score">0</strong>
+            </div>
+            <p id="score-summary">Your operating state is ready to analyze.</p>
+          </div>
+
+          <div class="category-card">
+            <h2>Category scores</h2>
+            <div id="category-scores" class="category-scores"></div>
+          </div>
+
+          <div class="recommendation-card">
+            <h2>Top 3 recommendations</h2>
+            <ol id="recommendations" class="recommendations"></ol>
+          </div>
+
+          <div class="assessment-actions">
+            <button class="button button-ghost" id="retake-assessment" type="button">
+              Retake Assessment
+            </button>
+            <a class="button button-text" href="index.html#waitlist">Join the Waitlist</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <a class="brand" href="index.html" aria-label="HUMAN.EXE home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>HUMAN.EXE</span>
+        </a>
+        <p>Execute the Upgrade.</p>
+        <div class="footer-links">
+          <a href="index.html#human-index">Index</a>
+          <a href="index.html#privacy">Privacy</a>
+          <a href="index.html#waitlist">Waitlist</a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="assessment.js"></script>
+  </body>
+</html>
