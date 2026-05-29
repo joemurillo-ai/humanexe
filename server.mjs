@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const port = Number(process.env.PORT || 4173);
 const host = "127.0.0.1";
@@ -15,6 +16,37 @@ const contentTypes = {
 
 createServer(async (request, response) => {
   const url = new URL(request.url || "/", `http://${host}:${port}`);
+
+  if (url.pathname === "/api/waitlist") {
+    try {
+      const { onRequestGet, onRequestPost } = await import(
+        pathToFileURL(resolve(root, "functions/api/waitlist.js"))
+      );
+      const chunks = [];
+
+      for await (const chunk of request) {
+        chunks.push(chunk);
+      }
+
+      const body = Buffer.concat(chunks);
+      const apiRequest = new Request(`http://${host}:${port}${url.pathname}`, {
+        method: request.method,
+        headers: request.headers,
+        body: body.length ? body : undefined,
+      });
+      const handler = request.method === "POST" ? onRequestPost : onRequestGet;
+      const apiResponse = await handler({ request: apiRequest, env: {} });
+
+      response.writeHead(apiResponse.status, Object.fromEntries(apiResponse.headers));
+      response.end(await apiResponse.text());
+    } catch {
+      response.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+      response.end(JSON.stringify({ ok: false, error: "Waitlist unavailable" }));
+    }
+
+    return;
+  }
+
   const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
   const filePath = resolve(root, `.${decodeURIComponent(pathname)}`);
 

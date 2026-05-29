@@ -1,6 +1,6 @@
 const forms = document.querySelectorAll(".waitlist-form");
 const storageKey = "human-exe-waitlist";
-const endpoint = window.HUMAN_EXE_WAITLIST_ENDPOINT || "";
+const endpoint = window.HUMAN_EXE_WAITLIST_ENDPOINT || "/api/waitlist";
 const revealTargets = document.querySelectorAll(
   ".section, .logo-cloud, .ecosystem-grid article, .feature-grid article, .privacy-grid article, .timeline li, .waitlist"
 );
@@ -26,9 +26,10 @@ if ("IntersectionObserver" in window) {
 }
 
 forms.forEach((form) => {
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const message = form.querySelector(".form-message");
+    const button = form.querySelector("button");
     const data = new FormData(form);
     const email = String(data.get("email") || "").trim();
 
@@ -44,15 +45,30 @@ forms.forEach((form) => {
       return;
     }
 
-    saveSignup(email);
+    if (button) {
+      button.disabled = true;
+    }
 
-    if (endpoint) {
-      fetch(endpoint, {
+    try {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, source: "humanexe.ai" }),
-      }).catch(() => {});
+      });
+
+      if (!response.ok) {
+        throw new Error("Waitlist request failed");
+      }
+    } catch {
+      message.classList.add("error");
+      message.textContent = "Connection issue. Try again in a moment.";
+      if (button) {
+        button.disabled = false;
+      }
+      return;
     }
+
+    saveSignup(email);
 
     if (typeof window.plausible === "function") {
       window.plausible("Waitlist Signup", { props: { source: "landing_page" } });
@@ -60,6 +76,9 @@ forms.forEach((form) => {
 
     syncMessages("System online. You’re on the list.");
     forms.forEach((item) => item.reset());
+    if (button) {
+      button.disabled = false;
+    }
   });
 });
 
