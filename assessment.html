@@ -47,7 +47,7 @@
 
       <main class="assessment-page" id="top">
         <section class="assessment-hero">
-          <p class="eyebrow">HUMAN.EXE Assessment V0.1</p>
+          <p class="eyebrow">HUMAN.EXE Assessment V0.2</p>
           <h1>Generate your ⓗ score.</h1>
           <p>
             A private five-minute check across recovery, training, fuel, focus,
@@ -62,7 +62,7 @@
               <h2 id="assessment-title">Answer 20 signals.</h2>
               <p>
                 Rate each statement from 1 to 5. HUMAN.EXE converts the pattern
-                into a 0-100 operating score and the top three moves to make next.
+                into a 0-100 operating score, trend history, and the top moves to make next.
               </p>
             </div>
             <div class="assessment-scale" aria-label="Assessment scale">
@@ -97,13 +97,40 @@
           </div>
 
           <div class="recommendation-card">
-            <h2>Top 3 recommendations</h2>
+            <h2>Improvement recommendations</h2>
             <ol id="recommendations" class="recommendations"></ol>
+          </div>
+
+          <div class="dashboard-card">
+            <div class="dashboard-heading">
+              <div>
+                <p class="eyebrow">Dashboard</p>
+                <h2>Human Index dashboard</h2>
+              </div>
+              <span id="history-count">0 entries</span>
+            </div>
+            <div class="dashboard-grid">
+              <div class="trend-card">
+                <h3>Score trend</h3>
+                <div id="score-trend" class="score-trend" aria-label="Human Index score trend"></div>
+              </div>
+              <div class="radar-card">
+                <h3>Category radar</h3>
+                <div id="radar-chart" class="radar-chart" aria-label="Category radar chart"></div>
+              </div>
+              <div class="history-card">
+                <h3>Previous scores</h3>
+                <div id="previous-scores" class="previous-scores"></div>
+              </div>
+            </div>
           </div>
 
           <div class="assessment-actions">
             <button class="button button-ghost" id="retake-assessment" type="button">
               Retake Assessment
+            </button>
+            <button class="button button-text" id="clear-history" type="button">
+              Clear History
             </button>
             <a class="button button-text" href="index.html#waitlist">Join the Waitlist</a>
           </div>

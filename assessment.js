@@ -1,4 +1,7 @@
-const assessmentKey = "human-exe-assessment-v01";
+const assessmentKey = "human-exe-assessment-v02-current";
+const legacyAssessmentKey = "human-exe-assessment-v01";
+const historyKey = "human-exe-assessment-history-v02";
+const maxHistoryEntries = 12;
 
 const categories = {
   recovery: {
@@ -135,6 +138,11 @@ const summary = document.querySelector("#score-summary");
 const categoryScores = document.querySelector("#category-scores");
 const recommendations = document.querySelector("#recommendations");
 const retake = document.querySelector("#retake-assessment");
+const clearHistory = document.querySelector("#clear-history");
+const historyCount = document.querySelector("#history-count");
+const scoreTrend = document.querySelector("#score-trend");
+const radarChart = document.querySelector("#radar-chart");
+const previousScores = document.querySelector("#previous-scores");
 
 renderQuestions();
 loadSavedResult();
@@ -151,7 +159,7 @@ form?.addEventListener("submit", (event) => {
   }
 
   const result = calculateResult(answers);
-  localStorage.setItem(assessmentKey, JSON.stringify(result));
+  saveResult(result);
   renderResult(result);
   results.hidden = false;
   message.textContent = "";
@@ -164,6 +172,17 @@ retake?.addEventListener("click", () => {
   form.reset();
   results.hidden = true;
   message.textContent = "";
+  document.querySelector(".assessment-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+clearHistory?.addEventListener("click", () => {
+  localStorage.removeItem(assessmentKey);
+  localStorage.removeItem(historyKey);
+  localStorage.removeItem(legacyAssessmentKey);
+  form.reset();
+  results.hidden = true;
+  message.textContent = "Assessment history cleared on this device.";
+  message.classList.remove("error");
   document.querySelector(".assessment-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
@@ -237,6 +256,7 @@ function calculateResult(answers) {
 function renderResult(result) {
   score.textContent = result.humanIndex;
   summary.textContent = getSummary(result.humanIndex);
+  const history = loadHistory();
 
   categoryScores.innerHTML = result.categories
     .map(
@@ -262,19 +282,174 @@ function renderResult(result) {
       `
     )
     .join("");
+
+  renderDashboard(result, history);
 }
 
 function loadSavedResult() {
   try {
+    migrateLegacyResult();
     const saved = JSON.parse(localStorage.getItem(assessmentKey) || "null");
+    const history = loadHistory();
+    const latest = saved || history[0] || null;
 
-    if (saved?.humanIndex) {
-      renderResult(saved);
+    if (latest?.humanIndex) {
+      renderResult(latest);
       results.hidden = false;
     }
   } catch {
     localStorage.removeItem(assessmentKey);
   }
+}
+
+function saveResult(result) {
+  localStorage.setItem(assessmentKey, JSON.stringify(result));
+  const history = loadHistory();
+  const next = [result, ...history]
+    .filter((item, index, list) => list.findIndex((candidate) => candidate.createdAt === item.createdAt) === index)
+    .slice(0, maxHistoryEntries);
+  localStorage.setItem(historyKey, JSON.stringify(next));
+}
+
+function loadHistory() {
+  try {
+    const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+    return Array.isArray(history) ? history.filter((item) => item?.humanIndex) : [];
+  } catch {
+    localStorage.removeItem(historyKey);
+    return [];
+  }
+}
+
+function migrateLegacyResult() {
+  const hasHistory = localStorage.getItem(historyKey);
+  const legacy = JSON.parse(localStorage.getItem(legacyAssessmentKey) || "null");
+
+  if (!hasHistory && legacy?.humanIndex) {
+    const migrated = {
+      ...legacy,
+      createdAt: legacy.createdAt || new Date().toISOString(),
+    };
+    localStorage.setItem(assessmentKey, JSON.stringify(migrated));
+    localStorage.setItem(historyKey, JSON.stringify([migrated]));
+  }
+}
+
+function renderDashboard(result, history) {
+  const orderedHistory = history.slice().reverse();
+  historyCount.textContent = `${history.length} ${history.length === 1 ? "entry" : "entries"}`;
+  scoreTrend.innerHTML = renderTrendChart(orderedHistory);
+  radarChart.innerHTML = renderRadarChart(result.categories);
+  previousScores.innerHTML = renderPreviousScores(history);
+}
+
+function renderTrendChart(history) {
+  if (!history.length) {
+    return `<p class="empty-state">Complete the assessment to start your Human Index trend.</p>`;
+  }
+
+  const width = 320;
+  const height = 150;
+  const padding = 18;
+  const points = history.map((item, index) => {
+    const x = history.length === 1 ? width / 2 : padding + (index / (history.length - 1)) * (width - padding * 2);
+    const y = height - padding - (item.humanIndex / 100) * (height - padding * 2);
+    return `${x},${y}`;
+  });
+
+  const latest = history[history.length - 1];
+  const first = history[0];
+  const delta = latest.humanIndex - first.humanIndex;
+  const deltaLabel = delta > 0 ? `+${delta}` : String(delta);
+
+  return `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Score trend from ${first.humanIndex} to ${latest.humanIndex}">
+      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" />
+      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" />
+      <polyline points="${points.join(" ")}" />
+      ${points
+        .map((point) => {
+          const [x, y] = point.split(",");
+          return `<circle cx="${x}" cy="${y}" r="4" />`;
+        })
+        .join("")}
+    </svg>
+    <div class="trend-meta">
+      <span>Latest ${latest.humanIndex}</span>
+      <span>${history.length > 1 ? `Trend ${deltaLabel}` : "Baseline set"}</span>
+    </div>
+  `;
+}
+
+function renderRadarChart(categoryResults) {
+  const size = 260;
+  const center = size / 2;
+  const radius = 94;
+  const labels = categoryResults.map((item) => item.label);
+  const points = categoryResults.map((item, index) => {
+    const angle = (Math.PI * 2 * index) / categoryResults.length - Math.PI / 2;
+    const valueRadius = radius * (item.score / 100);
+    return [
+      center + Math.cos(angle) * valueRadius,
+      center + Math.sin(angle) * valueRadius,
+    ];
+  });
+  const axis = categoryResults.map((item, index) => {
+    const angle = (Math.PI * 2 * index) / categoryResults.length - Math.PI / 2;
+    return {
+      x: center + Math.cos(angle) * radius,
+      y: center + Math.sin(angle) * radius,
+      labelX: center + Math.cos(angle) * (radius + 24),
+      labelY: center + Math.sin(angle) * (radius + 24),
+      label: labels[index],
+      score: item.score,
+    };
+  });
+
+  return `
+    <svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Radar chart of category scores">
+      <polygon class="radar-grid" points="${axis.map((item) => `${item.x},${item.y}`).join(" ")}" />
+      ${axis.map((item) => `<line x1="${center}" y1="${center}" x2="${item.x}" y2="${item.y}" />`).join("")}
+      <polygon class="radar-area" points="${points.map((point) => point.join(",")).join(" ")}" />
+      ${points.map((point) => `<circle cx="${point[0]}" cy="${point[1]}" r="4" />`).join("")}
+      ${axis
+        .map(
+          (item) => `
+            <text x="${item.labelX}" y="${item.labelY}">
+              ${item.label} ${item.score}
+            </text>
+          `
+        )
+        .join("")}
+    </svg>
+  `;
+}
+
+function renderPreviousScores(history) {
+  if (!history.length) {
+    return `<p class="empty-state">No previous scores yet.</p>`;
+  }
+
+  return history
+    .slice(0, 5)
+    .map(
+      (item, index) => `
+        <article>
+          <span>${index === 0 ? "Latest" : formatDate(item.createdAt)}</span>
+          <strong>ⓗ ${item.humanIndex}</strong>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function formatDate(value) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
 function getSummary(value) {
