@@ -1,17 +1,40 @@
-# HUMAN.EXE Landing Page
+# HUMAN.EXE
 
-HUMAN.EXE is a dark, futuristic landing page for a human performance platform. The product concept focuses on upgrading human readiness, focus, recovery, training, and output in a world increasingly centered on artificial intelligence.
+Premium landing page for HUMAN.EXE, a human performance operating layer for the AI age.
 
-This repository is Version 0.1: a static landing page with a waitlist form, hero visual, ecosystem overview, feature section, roadmap, and footer.
+HUMAN.EXE turns scattered health, training, recovery, and focus signals into one actionable operating state.
+
+```text
+Upgrade the Human.
+```
+
+## What Is HUMAN.EXE?
+
+HUMAN.EXE is a performance platform concept for founders, operators, athletes, creators, and high performers.
+
+Version 0.1 introduces:
+
+- HUMAN INDEX™: one daily score for recovery, focus, training load, and execution readiness.
+- AI Coach: a performance-aware assistant for choosing the next best action.
+- Privacy-first positioning for sensitive health and performance signals.
+- Waitlist capture for the private beta.
 
 ## Project Structure
 
 ```text
 .
 |-- assets/
+|   |-- favicon.svg
 |   `-- human-exe-hero.png
 |-- DEPLOYMENT.md
+|-- GITHUB_SETUP.md
+|-- LAUNCH_CHECKLIST.md
+|-- PROJECT_SUMMARY.md
 |-- README.md
+|-- SOCIAL_POSTS.md
+|-- functions/
+|   `-- api/
+|       `-- waitlist.js
 |-- index.html
 |-- qa-desktop.png
 |-- qa-mobile.png
@@ -20,11 +43,11 @@ This repository is Version 0.1: a static landing page with a waitlist form, hero
 `-- styles.css
 ```
 
-`qa-desktop.png` and `qa-mobile.png` are local verification screenshots. They are not required for Cloudflare Pages deployment.
+`qa-*.png` files are local verification screenshots. They are not required for Cloudflare Pages deployment.
 
 ## Run Locally
 
-This is a dependency-free static site. You only need Node.js to use the included preview server.
+This is a mostly static site. You only need Node.js to use the included local preview server.
 
 ```bash
 node server.mjs
@@ -40,26 +63,34 @@ You can also open `index.html` directly in a browser, but the local server is cl
 
 ## Waitlist Capture
 
-The waitlist form validates email addresses in the browser and stores submissions in `localStorage` for local testing.
+The waitlist form validates email addresses in the browser and posts to:
 
-For production, connect the form to a real endpoint by setting:
-
-```html
-<script>
-  window.HUMAN_EXE_WAITLIST_ENDPOINT = "https://your-waitlist-endpoint.example";
-</script>
+```text
+/api/waitlist
 ```
 
-Place that snippet before `script.js` in `index.html`, or replace the current client-side submission logic with your preferred waitlist provider.
+On Cloudflare Pages, this is handled by:
 
-Common options:
+```text
+functions/api/waitlist.js
+```
 
-- Cloudflare Pages Function
-- ConvertKit
-- Loops
-- Beehiiv
-- Formspree
-- Tally
+The function supports:
+
+- `WAITLIST_KV`: optional Cloudflare KV binding.
+- `WAITLIST_WEBHOOK_URL`: optional webhook secret for forwarding signups.
+
+If neither is configured, the endpoint still validates and returns success, which is useful for launch testing.
+
+## Analytics
+
+The site includes the Plausible Analytics script for:
+
+```text
+humanexe.ai
+```
+
+The waitlist form also sends a `Waitlist Signup` event when Plausible is available.
 
 ## Deploy To Cloudflare Pages
 
@@ -70,9 +101,16 @@ Common options:
 5. Connect the GitHub repository.
 6. Use these build settings:
    - Framework preset: `None`
-   - Build command: leave blank
+   - Build command: `exit 0`
    - Build output directory: `/`
 7. Deploy the project.
 8. Add the custom domain `humanexe.ai` in the Pages project settings.
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for the full domain setup flow.
+
+## Launch Docs
+
+- [GITHUB_SETUP.md](GITHUB_SETUP.md)
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md)
+- [SOCIAL_POSTS.md](SOCIAL_POSTS.md)

@@ -30,9 +30,11 @@ The deployable site should include:
 
 ```text
 assets/human-exe-hero.png
+assets/favicon.svg
 index.html
 styles.css
 script.js
+functions/api/waitlist.js
 server.mjs
 README.md
 PROJECT_SUMMARY.md
@@ -106,13 +108,13 @@ Use these settings:
 
 ```text
 Framework preset: None
-Build command: 
+Build command: exit 0
 Build output directory: /
 Root directory: /
 Production branch: main
 ```
 
-Leave the build command empty. This project has no build step.
+Use `exit 0` as the build command. Cloudflare recommends this for static sites that want access to Pages Functions.
 
 Click **Save and Deploy**.
 
@@ -205,23 +207,33 @@ https://humanexe.ai
 
 ## 11. Connect Production Waitlist Capture
 
-The current Version 0.1 form stores emails in browser `localStorage` for local testing. Before a public launch, connect it to a real backend.
+The current Version 0.1 form posts to:
 
-Recommended Cloudflare-native option:
+```text
+/api/waitlist
+```
 
-1. Add a Pages Function at:
+That endpoint is implemented as a Cloudflare Pages Function:
 
 ```text
 functions/api/waitlist.js
 ```
 
-2. Store submissions in Cloudflare D1, KV, R2, or forward them to an external CRM/email tool.
-3. Add this snippet before `script.js` in `index.html`:
+Recommended Cloudflare-native option:
 
-```html
-<script>
-  window.HUMAN_EXE_WAITLIST_ENDPOINT = "/api/waitlist";
-</script>
+Recommended Cloudflare-native setup:
+
+1. Create a KV namespace for waitlist submissions.
+2. Bind it to the Pages project as:
+
+```text
+WAITLIST_KV
+```
+
+3. Optional: add a Pages secret for forwarding submissions:
+
+```text
+WAITLIST_WEBHOOK_URL
 ```
 
 4. Redeploy through Cloudflare Pages.

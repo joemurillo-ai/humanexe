@@ -54,6 +54,10 @@ forms.forEach((form) => {
       }).catch(() => {});
     }
 
+    if (typeof window.plausible === "function") {
+      window.plausible("Waitlist Signup", { props: { source: "landing_page" } });
+    }
+
     syncMessages("System online. You’re on the list.");
     forms.forEach((item) => item.reset());
   });
