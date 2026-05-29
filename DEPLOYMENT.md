@@ -1,333 +1,256 @@
-# Deploy HUMAN.EXE To humanexe.ai
+# HUMAN.EXE Cloudflare Pages Deployment
 
-This guide publishes the HUMAN.EXE Version 0.1 static landing page to:
+This runbook connects the source-of-truth GitHub repository to Cloudflare Pages and publishes HUMAN.EXE at:
 
 ```text
 https://humanexe.ai
 ```
 
-Hosting target:
-
-```text
-Cloudflare Pages
-```
-
 ## Source Of Truth
 
-The source of truth repository is:
+Use this repository:
 
 ```text
 https://github.com/joemurillo-ai/humanexe
 ```
 
-The older repository is no longer used for production deployment:
+The older repository is not production:
 
 ```text
 https://github.com/joemurillo-ai/humanexe-landing-page
 ```
 
-Its Cloudflare Pages GitHub Actions workflow should remain disabled to avoid duplicate failed deployments.
+Keep the old repository disconnected from Cloudflare Pages to avoid duplicate or failed deployments.
 
-## Connection Status
+## Deployment Model
 
-This project is ready to deploy, but `humanexe.ai` cannot be connected from the local workspace alone. Connecting the domain requires access to the Cloudflare account that manages `humanexe.ai`, or access to the DNS provider where the domain is registered.
-
-Use this guide to:
-
-- Deploy the static site to Cloudflare Pages.
-- Attach `humanexe.ai` to the Pages project.
-- Attach `www.humanexe.ai`.
-- Confirm HTTPS.
-- Prepare production waitlist capture.
-
-## 1. Confirm The Project Files
-
-The deployable site should include:
+Recommended production path:
 
 ```text
-assets/human-exe-hero.png
-assets/favicon.svg
-index.html
-styles.css
-script.js
-functions/api/waitlist.js
-server.mjs
-README.md
-PROJECT_SUMMARY.md
-DEPLOYMENT.md
+GitHub main branch -> Cloudflare Pages Git integration -> humanexe.ai
 ```
 
-The local QA screenshots are optional and do not need to be deployed:
+Do not use both Cloudflare Git integration and GitHub Actions deployment at the same time unless you intentionally want two deployment paths. The current recommendation is Cloudflare Pages Git integration.
 
-```text
-qa-desktop.png
-qa-mobile.png
-```
+## Prerequisites
 
-## 2. Preview Locally
-
-From the project folder:
-
-```bash
-node server.mjs
-```
-
-Open:
-
-```text
-http://127.0.0.1:4173
-```
-
-Verify:
-
-- The hero image loads.
-- The waitlist form is visible above the fold.
-- The email field validates submissions.
-- The Problem, Solution, Ecosystem, Features, Roadmap, and Footer sections render.
-- The site works on desktop and mobile.
-
-Stop the local server with `Ctrl+C`.
-
-## 3. Push To GitHub
-
-Create a GitHub repository, then commit and push the project:
-
-```bash
-git add .
-git commit -m "Ship HUMAN.EXE v0.1"
-git branch -M main
-git remote add origin https://github.com/<your-user-or-org>/<repo-name>.git
-git push -u origin main
-```
-
-If the remote already exists, use:
-
-```bash
-git push
-```
-
-Cloudflare Pages can deploy directly from GitHub, and every push to the selected production branch can trigger a new deployment.
-
-## 4. Create The Cloudflare Pages Project
-
-1. Log in to Cloudflare.
-2. Open **Workers & Pages** in the Cloudflare dashboard.
-3. Click **Create application**.
-4. Select **Pages**.
-5. Choose **Connect to Git**.
-6. Connect GitHub if prompted.
-7. Select `joemurillo-ai/humanexe`.
-
-Recommended project name:
+- GitHub repository access to `joemurillo-ai/humanexe`
+- Cloudflare account access
+- Ownership or DNS control of `humanexe.ai`
+- `main` branch pushed to GitHub
+- Cloudflare Pages project name available:
 
 ```text
 humanexe-ai
 ```
 
-## 5. Configure Build Settings
+## Step 1: Confirm GitHub Is Ready
 
-Use these settings:
+From the local project directory:
+
+```bash
+git status
+git remote -v
+git branch --show-current
+git push origin main
+```
+
+Expected:
 
 ```text
-Framework preset: None
-Build command: exit 0
-Build output directory: /
-Root directory: /
+Branch: main
+Origin: https://github.com/joemurillo-ai/humanexe.git
+Working tree: clean
+```
+
+## Step 2: Create Cloudflare Pages Project
+
+1. Log in to Cloudflare.
+2. Open **Workers & Pages**.
+3. Select **Create application**.
+4. Select **Pages**.
+5. Select **Connect to Git**.
+6. Choose GitHub.
+7. Authorize the Cloudflare Workers & Pages GitHub app if prompted.
+8. Grant access to only this repository when possible:
+
+```text
+joemurillo-ai/humanexe
+```
+
+9. Select the repository and continue.
+
+Cloudflare documentation reference:
+
+```text
+https://developers.cloudflare.com/pages/get-started/git-integration/
+```
+
+## Step 3: Configure Pages Settings
+
+Use these exact settings:
+
+```text
+Project name: humanexe-ai
 Production branch: main
+Framework preset: None
+Root directory: /
+Build command: leave blank
+Build output directory: /
+Environment variables: none required for the static page
 ```
 
-Use `exit 0` as the build command. Cloudflare recommends this for static sites that want access to Pages Functions.
+Why the build command is blank:
 
-Click **Save and Deploy**.
+This project is a static HTML/CSS/JS site at the repository root. Cloudflare Pages supports deploying without a framework or build step.
 
-For this repository, Cloudflare should serve `index.html` directly from the repository root.
+If Cloudflare requires a non-empty build command in your dashboard, use:
 
-## 6. Verify The Pages Preview URL
+```bash
+exit 0
+```
 
-Cloudflare will create a temporary preview URL similar to:
+Then select **Save and Deploy**.
+
+## Step 4: Verify The pages.dev Preview
+
+Cloudflare will create a preview URL similar to:
 
 ```text
-https://<project-name>.pages.dev
+https://humanexe-ai.pages.dev
 ```
 
-Open that URL and verify the landing page before attaching the production domain.
+Open it and verify:
 
-## 7. Add humanexe.ai
+- Homepage loads.
+- `assets/human-exe-hero.png` loads.
+- `assets/favicon.svg` loads.
+- Waitlist form is visible.
+- `/api/waitlist` does not 404 on production Pages.
+- Desktop and mobile layouts have no horizontal overflow.
 
-In the Cloudflare Pages project:
+## Step 5: Add humanexe.ai
+
+Inside the Cloudflare Pages project:
 
 1. Open **Custom domains**.
-2. Click **Set up a custom domain**.
+2. Select **Set up a domain**.
 3. Enter:
 
 ```text
 humanexe.ai
 ```
 
-4. Follow Cloudflare's prompts.
-5. Wait until the domain status shows **Active**.
+4. Follow Cloudflare's DNS prompts.
+5. Wait for the custom domain status to become **Active**.
 
-If `humanexe.ai` already uses Cloudflare nameservers, Cloudflare can configure the DNS record automatically.
+Important:
 
-If DNS is hosted somewhere else, Cloudflare will provide DNS instructions that must be completed at the current DNS provider before the domain can become active.
+Cloudflare requires an apex/root custom domain like `humanexe.ai` to be on Cloudflare DNS in the same Cloudflare account as the Pages project.
 
-Expected production URL:
+Cloudflare documentation reference:
 
 ```text
-https://humanexe.ai
+https://developers.cloudflare.com/pages/configuration/custom-domains/
 ```
 
-## 8. Add www.humanexe.ai
+## Step 6: Add www.humanexe.ai
 
-Repeat the custom domain flow for:
+Add a second custom domain:
 
 ```text
 www.humanexe.ai
 ```
 
-Recommended final setup:
+Recommended canonical setup:
 
 ```text
-Primary domain: humanexe.ai
-Redirect: www.humanexe.ai -> humanexe.ai
+Primary: https://humanexe.ai
+Redirect: https://www.humanexe.ai/* -> https://humanexe.ai/$1
 ```
 
-Use Cloudflare Redirect Rules if you want all traffic to resolve to the root domain.
+Use Cloudflare Bulk Redirects or Redirect Rules for the `www` redirect.
 
-## 9. Confirm HTTPS
+Cloudflare documentation reference:
 
-Cloudflare Pages automatically provisions SSL certificates for custom domains.
+```text
+https://developers.cloudflare.com/pages/how-to/www-redirect/
+```
 
-After both custom domains are active, open:
+## Step 7: Configure Waitlist Storage
+
+The site posts waitlist signups to:
+
+```text
+/api/waitlist
+```
+
+The Cloudflare Pages Function lives at:
+
+```text
+functions/api/waitlist.js
+```
+
+Recommended production setup:
+
+1. In Cloudflare, create a KV namespace named:
+
+```text
+HUMANEXE_WAITLIST
+```
+
+2. Open the Pages project.
+3. Go to **Settings** -> **Bindings**.
+4. Add a KV namespace binding:
+
+```text
+Variable name: WAITLIST_KV
+KV namespace: HUMANEXE_WAITLIST
+```
+
+5. Optional: add a secret for forwarding signups to another system:
+
+```text
+WAITLIST_WEBHOOK_URL
+```
+
+6. Redeploy the Pages project.
+
+## Step 8: Verify Production
+
+Open:
 
 ```text
 https://humanexe.ai
 https://www.humanexe.ai
 ```
 
-Confirm:
+Verify:
 
-- Both domains load securely over HTTPS.
-- The root domain is the preferred canonical version.
-- There are no mixed-content warnings.
-- The hero image loads from `/assets/human-exe-hero.png`.
-- The waitlist form validates email addresses.
-
-## 10. Optional: Redirect pages.dev To humanexe.ai
-
-After the custom domain works, you may want the temporary Cloudflare Pages URL to redirect to the production domain.
-
-In Cloudflare:
-
-1. Open the Pages project.
-2. Find the redirect/custom-domain settings available for the project.
-3. Configure the `*.pages.dev` deployment URL to redirect to:
-
-```text
-https://humanexe.ai
-```
-
-## 11. Connect Production Waitlist Capture
-
-The current Version 0.1 form posts to:
-
-```text
-/api/waitlist
-```
-
-That endpoint is implemented as a Cloudflare Pages Function:
-
-```text
-functions/api/waitlist.js
-```
-
-Recommended Cloudflare-native setup:
-
-1. Create a KV namespace for waitlist submissions.
-2. Bind it to the Pages project as:
-
-```text
-WAITLIST_KV
-```
-
-3. Optional: add a Pages secret for forwarding submissions:
-
-```text
-WAITLIST_WEBHOOK_URL
-```
-
-4. Redeploy through Cloudflare Pages.
-
-Low-code alternatives:
-
-- Loops
-- ConvertKit
-- Beehiiv
-- Formspree
-- Tally
-
-## 12. Final Launch Checklist
-
-Before announcing the site:
-
-- `https://humanexe.ai` loads.
-- `https://www.humanexe.ai` redirects or resolves correctly.
-- SSL is active.
+- HTTPS is active.
+- The root domain is canonical.
+- `www` redirects to root or loads intentionally.
 - The page title is `HUMAN.EXE | Upgrade the Human`.
-- The SEO description is present.
-- The hero image loads.
-- Desktop layout has no horizontal overflow.
-- Mobile layout has no horizontal overflow.
-- Waitlist capture is connected to a real backend.
-- The temporary `*.pages.dev` URL is handled as desired.
+- Open Graph tags exist.
+- Favicon loads.
+- Waitlist form returns the success state after submission.
+- Cloudflare Pages deployment logs show success.
 
-## 13. Redeploy Updates
+## Step 9: Ongoing Deployment Flow
 
-After Cloudflare Pages is connected to GitHub, every push to `main` triggers a new deployment.
-
-Typical update flow:
+After Cloudflare Pages is connected to GitHub, ship updates with:
 
 ```bash
 git add .
 git commit -m "Update HUMAN.EXE landing page"
-git push
+git push origin main
 ```
 
-Then check the Cloudflare Pages deployment log and visit:
+Each push to `main` should trigger a Cloudflare Pages production deployment.
 
-```text
-https://humanexe.ai
-```
+## Related Guides In This Repository
 
-## 14. Optional GitHub Actions Deployment
+- `DNS_SETUP.md`
+- `CLOUDFLARE_PAGES_SETTINGS.md`
+- `SSL_VERIFICATION_CHECKLIST.md`
 
-This repository includes:
-
-```text
-.github/workflows/cloudflare-pages.yml
-```
-
-This workflow deploys the repository root to Cloudflare Pages with Wrangler. It is intentionally manual-only to prevent failed deployments before Cloudflare secrets are configured.
-
-Required GitHub repository secrets:
-
-```text
-CLOUDFLARE_API_TOKEN
-CLOUDFLARE_ACCOUNT_ID
-```
-
-The workflow command is:
-
-```text
-pages deploy . --project-name=humanexe-ai --branch=main
-```
-
-Use either the Cloudflare Git integration or this GitHub Actions workflow. You do not need both active at the same time.
-
-Recommended production path:
-
-```text
-Cloudflare Pages Git integration -> joemurillo-ai/humanexe -> main
-```
-
-Use the GitHub Actions workflow only after adding both required secrets.
