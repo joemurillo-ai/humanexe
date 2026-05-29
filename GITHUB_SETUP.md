@@ -2,10 +2,10 @@
 
 This project is ready to publish as a public GitHub repository for the HUMAN.EXE Version 0.1 landing page.
 
-## Recommended Repository
+## Source Repository
 
 ```text
-humanexe-landing-page
+joemurillo-ai/humanexe
 ```
 
 Recommended visibility:
@@ -19,13 +19,13 @@ Public
 From the project folder:
 
 ```bash
-gh repo create humanexe-landing-page --public --source=. --remote=origin --push
+gh repo create humanexe --public --source=. --remote=origin --push
 ```
 
 If the repository already exists:
 
 ```bash
-git remote add origin https://github.com/<owner>/humanexe-landing-page.git
+git remote add origin https://github.com/joemurillo-ai/humanexe.git
 git push -u origin master
 ```
 
@@ -44,7 +44,7 @@ git push -u origin main
 
 ## GitHub Actions Secrets For Cloudflare Deploys
 
-If using the included Cloudflare Pages workflow, add these repository secrets:
+If using the included manual Cloudflare Pages workflow, add these repository secrets:
 
 ```text
 CLOUDFLARE_API_TOKEN
@@ -55,6 +55,12 @@ Workflow file:
 
 ```text
 .github/workflows/cloudflare-pages.yml
+```
+
+The workflow is manual-only. For production, the recommended path is Cloudflare Pages Git integration connected directly to:
+
+```text
+joemurillo-ai/humanexe
 ```
 
 ## Public Repo Checklist

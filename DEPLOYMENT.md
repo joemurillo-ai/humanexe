@@ -12,6 +12,22 @@ Hosting target:
 Cloudflare Pages
 ```
 
+## Source Of Truth
+
+The source of truth repository is:
+
+```text
+https://github.com/joemurillo-ai/humanexe
+```
+
+The older repository is no longer used for production deployment:
+
+```text
+https://github.com/joemurillo-ai/humanexe-landing-page
+```
+
+Its Cloudflare Pages GitHub Actions workflow should remain disabled to avoid duplicate failed deployments.
+
 ## Connection Status
 
 This project is ready to deploy, but `humanexe.ai` cannot be connected from the local workspace alone. Connecting the domain requires access to the Cloudflare account that manages `humanexe.ai`, or access to the DNS provider where the domain is registered.
@@ -100,7 +116,7 @@ Cloudflare Pages can deploy directly from GitHub, and every push to the selected
 4. Select **Pages**.
 5. Choose **Connect to Git**.
 6. Connect GitHub if prompted.
-7. Select the HUMAN.EXE repository.
+7. Select `joemurillo-ai/humanexe`.
 
 Recommended project name:
 
@@ -225,8 +241,6 @@ That endpoint is implemented as a Cloudflare Pages Function:
 functions/api/waitlist.js
 ```
 
-Recommended Cloudflare-native option:
-
 Recommended Cloudflare-native setup:
 
 1. Create a KV namespace for waitlist submissions.
@@ -293,7 +307,7 @@ This repository includes:
 .github/workflows/cloudflare-pages.yml
 ```
 
-This workflow deploys the repository root to Cloudflare Pages with Wrangler.
+This workflow deploys the repository root to Cloudflare Pages with Wrangler. It is intentionally manual-only to prevent failed deployments before Cloudflare secrets are configured.
 
 Required GitHub repository secrets:
 
@@ -309,3 +323,11 @@ pages deploy . --project-name=humanexe-ai --branch=main
 ```
 
 Use either the Cloudflare Git integration or this GitHub Actions workflow. You do not need both active at the same time.
+
+Recommended production path:
+
+```text
+Cloudflare Pages Git integration -> joemurillo-ai/humanexe -> main
+```
+
+Use the GitHub Actions workflow only after adding both required secrets.

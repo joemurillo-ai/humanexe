@@ -1,9 +1,8 @@
 name: Deploy to Cloudflare Pages
 
 on:
-  push:
-    branches:
-      - main
+  # Manual-only by default. Prefer Cloudflare Pages Git integration for
+  # production deploys, or add the required secrets and run this explicitly.
   workflow_dispatch:
 
 jobs:
