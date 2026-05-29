@@ -1140,18 +1140,18 @@ input:focus {
 }
 
 .assessment-page {
-  padding: 64px 0 96px;
+  padding: 34px 0 96px;
 }
 
 .assessment-hero {
   max-width: 860px;
-  padding: 68px 0 54px;
+  padding: 28px 0 24px;
 }
 
 .assessment-hero h1 {
   max-width: 760px;
-  margin-bottom: 22px;
-  font-size: clamp(3.2rem, 10vw, 7rem);
+  margin-bottom: 12px;
+  font-size: clamp(2.7rem, 6.4vw, 4.7rem);
 }
 
 .assessment-hero p:not(.eyebrow) {
@@ -1260,9 +1260,9 @@ input:focus {
 
 .question-card {
   display: grid;
-  gap: 12px;
+  gap: 8px;
   margin: 0;
-  padding: 15px;
+  padding: 12px;
   border: 1px solid rgba(216, 255, 226, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.032);
@@ -1273,7 +1273,7 @@ input:focus {
   gap: 4px;
   padding: 0;
   color: var(--text);
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 720;
   line-height: 1.32;
 }
@@ -1288,30 +1288,41 @@ input:focus {
 
 .rating-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(42px, 1fr));
-  gap: 7px;
+  grid-template-rows: auto auto;
+  gap: 4px;
   max-width: 360px;
+}
+
+.rating-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(42px, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(42px, 1fr);
+  gap: 7px;
 }
 
 .rating-row label {
   display: grid;
   min-width: 0;
-  min-height: 42px;
+  min-height: 30px;
+  width: 100%;
   place-items: center;
   cursor: pointer;
+  line-height: 1;
 }
 
 .rating-row input {
   position: absolute;
+  inset: auto;
   width: 1px;
   height: 1px;
+  margin: 0;
   opacity: 0;
   pointer-events: none;
 }
 
 .rating-numbers {
   display: grid;
-  grid-column: 1 / -1;
   grid-template-columns: repeat(5, minmax(42px, 1fr));
   gap: 7px;
 }
@@ -1326,8 +1337,9 @@ input:focus {
 
 .rating-row label > span {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
+  max-width: 28px;
   place-items: center;
   border: 1px solid rgba(216, 255, 226, 0.16);
   border-radius: 999px;
@@ -1392,10 +1404,14 @@ input:focus {
 
 .assessment-results {
   display: grid;
-  grid-template-columns: 0.82fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 18px;
   margin-top: 24px;
   padding: clamp(20px, 4vw, 34px);
+}
+
+.assessment-results > * {
+  min-width: 0;
 }
 
 .assessment-results[hidden] {
@@ -1919,16 +1935,16 @@ input:focus {
   }
 
   .rating-row {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
     max-width: none;
   }
 
-  .rating-numbers {
+  .rating-numbers,
+  .rating-options {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .rating-row label > span {
-    width: 100%;
+    width: 32px;
     max-width: 44px;
   }
 

@@ -234,7 +234,9 @@ function renderQuestions() {
               <span>4</span>
               <span>5</span>
             </div>
-            ${options}
+            <div class="rating-options">
+              ${options}
+            </div>
           </div>
         </fieldset>
       `;
