@@ -108,7 +108,7 @@ Canonical: https://humanexe.ai
 Redirect: https://www.humanexe.ai/* -> https://humanexe.ai/$1
 ```
 
-Set this with Cloudflare Bulk Redirects or Redirect Rules.
+This repository includes a Cloudflare Pages `_redirects` file for this rule. If you prefer to manage redirects in the dashboard instead, use Cloudflare Bulk Redirects or Redirect Rules.
 
 ## Step 6: DNS Verification Commands
 
@@ -145,4 +145,3 @@ www.humanexe.ai returns 301/308 to humanexe.ai or returns 200 if intentionally n
 
 - Cloudflare Pages custom domains: `https://developers.cloudflare.com/pages/configuration/custom-domains/`
 - Redirecting www to apex: `https://developers.cloudflare.com/pages/how-to/www-redirect/`
-

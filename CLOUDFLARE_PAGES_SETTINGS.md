@@ -60,6 +60,8 @@ https://humanexe.ai -> primary production domain
 https://www.humanexe.ai -> redirect to https://humanexe.ai
 ```
 
+The repository includes `_redirects` for the `www` to apex redirect.
+
 ## Functions
 
 This repository includes a Pages Function:
@@ -110,4 +112,3 @@ After every production deployment, verify:
 - Custom domains are active.
 - `/api/waitlist` responds on the custom domain.
 - No old Pages project is attached to `humanexe.ai`.
-

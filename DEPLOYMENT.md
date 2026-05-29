@@ -229,7 +229,7 @@ Verify:
 
 - HTTPS is active.
 - The root domain is canonical.
-- `www` redirects to root or loads intentionally.
+- `www` redirects to root through `_redirects`.
 - The page title is `HUMAN.EXE | Upgrade the Human`.
 - Open Graph tags exist.
 - Favicon loads.
@@ -254,3 +254,12 @@ Each push to `main` should trigger a Cloudflare Pages production deployment.
 - `CLOUDFLARE_PAGES_SETTINGS.md`
 - `SSL_VERIFICATION_CHECKLIST.md`
 
+## Cloudflare Static Config Files
+
+This repository includes:
+
+```text
+_redirects
+```
+
+The redirect file makes `www.humanexe.ai` canonicalize to `humanexe.ai` after both custom domains are connected to the same Pages project.
