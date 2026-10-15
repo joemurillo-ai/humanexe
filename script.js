@@ -57,11 +57,13 @@ forms.forEach((form) => {
       });
 
       if (!response.ok) {
-        throw new Error("Waitlist request failed");
+        throw new Error(response.status === 503 ? "WAITLIST_UNAVAILABLE" : "WAITLIST_FAILED");
       }
-    } catch {
+    } catch (error) {
       message.classList.add("error");
-      message.textContent = "Connection issue. Try again in a moment.";
+      message.textContent = error.message === "WAITLIST_UNAVAILABLE"
+        ? "Waitlist signups are temporarily unavailable. Please try later."
+        : "We could not confirm your signup. Please try again.";
       if (button) {
         button.disabled = false;
       }
