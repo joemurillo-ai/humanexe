@@ -1,34 +1,67 @@
-export async function onRequestPost({ request, env }) {
+// Fail closed: a successful response requires confirmation from at least one
+// configured destination. Never log or return submitted email addresses.
+export async function onRequestPost({ request, env = {} }) {
   let payload;
-
   try {
     payload = await request.json();
   } catch {
     return json({ ok: false, error: "Invalid JSON" }, 400);
   }
 
-  const email = String(payload.email || "").trim().toLowerCase();
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return json({ ok: false, error: "Invalid request" }, 400);
+  }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  const email = typeof payload.email === "string" ? payload.email.trim().toLowerCase() : "";
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ ok: false, error: "Invalid email" }, 400);
+  }
+
+  const hasKv = Boolean(env.WAITLIST_KV && typeof env.WAITLIST_KV.put === "function");
+  const hasWebhook = typeof env.WAITLIST_WEBHOOK_URL === "string" && env.WAITLIST_WEBHOOK_URL.length > 0;
+
+  if (!hasKv && !hasWebhook) {
+    return json({ ok: false, error: "Waitlist temporarily unavailable" }, 503);
   }
 
   const entry = {
     email,
-    source: payload.source || "humanexe.ai",
+    source: "humanexe.ai",
     createdAt: new Date().toISOString(),
   };
 
-  if (env.WAITLIST_KV) {
-    await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify(entry));
+  // Attempt both configured destinations; accept if at least one confirms.
+  // A successful KV put is a provider acknowledgment, not proof of global
+  // replication or downstream delivery.
+  let accepted = false;
+
+  if (hasKv) {
+    try {
+      await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify(entry));
+      accepted = true;
+    } catch {
+      // The webhook may still provide a valid independent destination.
+    }
   }
 
-  if (env.WAITLIST_WEBHOOK_URL) {
-    await fetch(env.WAITLIST_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry),
-    });
+  if (hasWebhook) {
+    try {
+      const url = new URL(env.WAITLIST_WEBHOOK_URL);
+      if (url.protocol === "https:") {
+        const response = await fetch(url.toString(), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry),
+        });
+        if (response.ok) accepted = true;
+      }
+    } catch {
+      // Fail closed if no other destination acknowledged the entry.
+    }
+  }
+
+  if (!accepted) {
+    return json({ ok: false, error: "Waitlist temporarily unavailable" }, 503);
   }
 
   return json({ ok: true });
