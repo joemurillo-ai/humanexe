@@ -1,8 +1,8 @@
 # HUMAN.EXE
 
-Premium landing page for HUMAN.EXE, a human performance operating layer for the AI age.
+Landing-page prototype for HUMAN.EXE, a proposed human-performance platform for the AI age.
 
-HUMAN.EXE turns scattered health, training, recovery, and focus signals into one actionable operating state.
+The product concept aims to translate health, training, recovery, and focus signals into an actionable daily view. The repository demonstrates a web experience; it does not establish validated health scoring or a deployed coaching service.
 
 ```text
 Upgrade the Human.
@@ -80,7 +80,7 @@ The function supports:
 - `WAITLIST_KV`: optional Cloudflare KV binding.
 - `WAITLIST_WEBHOOK_URL`: optional webhook secret for forwarding signups.
 
-If neither is configured, the endpoint still validates and returns success, which is useful for launch testing.
+**Important:** If neither destination is configured, the endpoint may still return a success response for testing **without retaining the email address**. Do not advertise the waitlist as operational until a storage or forwarding destination is configured and end-to-end persistence has been verified. This behavior needs a code-level fix before a production launch; the README change alone does not resolve it.
 
 ## Analytics
 
@@ -114,3 +114,17 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the full domain setup flow.
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md)
 - [SOCIAL_POSTS.md](SOCIAL_POSTS.md)
+
+## Responsible product boundaries
+
+The HUMAN INDEX and AI Coach are product concepts, not validated medical measures or clinical recommendations. Avoid presenting sample scores as medical guidance. Do not collect sensitive health information without a defined privacy policy, data-retention controls, and appropriate security review.
+
+## Release checklist
+
+- [ ] Confirm waitlist submissions are durably recorded or explicitly rejected when storage is unavailable.
+- [ ] Verify error and success messages reflect actual backend outcomes.
+- [ ] Run and pass CI, local checks, and accessibility review.
+- [ ] Verify analytics and privacy disclosures before production use.
+- [ ] Confirm the domain and production deployment independently.
+
+These items are not represented as completed by this documentation update.
