@@ -80,7 +80,7 @@ The function supports:
 - `WAITLIST_KV`: optional Cloudflare KV binding.
 - `WAITLIST_WEBHOOK_URL`: optional webhook secret for forwarding signups.
 
-**Important:** If neither destination is configured, the endpoint may still return a success response for testing **without retaining the email address**. Do not advertise the waitlist as operational until a storage or forwarding destination is configured and end-to-end persistence has been verified. This behavior needs a code-level fix before a production launch; the README change alone does not resolve it.
+**Important:** The proposed fail-closed implementation is under review on a separate branch: without configured storage/forwarding it returns HTTP 503, and it only returns success after at least one destination acknowledges the write. This does **not** mean production has been updated or that delivery/persistence has been independently verified. Webhook acknowledgment is not proof of downstream durable storage.
 
 ## Analytics
 
@@ -128,3 +128,7 @@ The HUMAN INDEX and AI Coach are product concepts, not validated medical measure
 - [ ] Confirm the domain and production deployment independently.
 
 These items are not represented as completed by this documentation update.
+
+## Proposed waitlist fix — review branch only
+
+Branch: `fix/waitlist-fail-closed-review`. Proposed tests: `node --test tests/waitlist.test.mjs` (Node 20+ recommended). These tests have not yet been executed or reviewed independently. The branch must not be merged or deployed until test results, Cloudflare configuration, and production data-handling requirements are verified.
